@@ -1,0 +1,12 @@
+#include "BlockBuffer.h"
+
+#include <cstdlib>
+#include <cstring>
+
+BlockBuffer:: BlockBuffer(int blocknum){
+	this->blocknum=blocknum;
+
+}
+
+// calls the parent class constructor
+RecBuffer::RecBuffer(int blockNum) : BlockBuffer::BlockBuffer(blockNum) 
