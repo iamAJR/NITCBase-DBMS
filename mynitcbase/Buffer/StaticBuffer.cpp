@@ -9,6 +9,10 @@ StaticBuffer::StaticBuffer() {
   // initialise all blocks as free
   for (int bufferIndex=0;bufferIndex<BUFFER_CAPACITY;bufferIndex++) {
     metainfo[bufferIndex].free = true;
+    metainfo[bufferIndex].dirty=false;
+    metainfo[bufferIndex].timeStamp=-1;
+    metainfo[bufferIndex].free=-1;
+
   }
 }
 
@@ -17,27 +21,51 @@ At this stage, we are not writing back from the buffer to the disk since we are
 not modifying the buffer. So, we will define an empty destructor for now. In
 subsequent stages, we will implement the write-back functionality here.
 */
-StaticBuffer::~StaticBuffer() {}
+StaticBuffer::~StaticBuffer() {
+
+  for (int bufferIndex=0;bufferIndex<BUFFER_CAPACITY;bufferIndex++){
+     if(metainfo[bufferIndex].free==false and metainfo[bufferIndex].dirty==true){
+      Disk::writeBlock(blocks[bufferIndex],metainfo[bufferIndex].blockNum);
+    }
+  }
+
+
+}
 
 int StaticBuffer::getFreeBuffer(int blockNum) {
   if (blockNum < 0 || blockNum > DISK_BLOCKS) {
     return E_OUTOFBOUND;
   }
-  int allocatedBuffer;
+  int allocatedBuffer=-1;
+
+  int maxTimeStamp=-1; 
  for(int i=0;i<BUFFER_CAPACITY;i++){
+  if (!metaInfo[i].free) {
+            metaInfo[i].timeStamp++;
+        }
+
 	if(metainfo[i].free){
 	allocatedBuffer=i;
 	break;
-}
+}}
 
-}
+if (allocatedBuffer == -1) {
+        for (int i = 0; i < BUFFER_CAPACITY; i++) {
+            if (metaInfo[i].timeStamp > maxTimeStamp) {
+                maxTimeStamp = metaInfo[i].timeStamp;
+                allocatedBuffer = i;
+            }
+        }
+        if (metaInfo[allocatedBuffer].dirty) {
+            Disk::writeBlock(metaInfo[allocatedBuffer].blockNum, buffer[allocatedBuffer]);
+        }
+    }
 
-  // iterate through all the blocks in the StaticBuffer
-  // find the first free block in the buffer (check metainfo)
-  // assign allocatedBuffer = index of the free block
 
-  metainfo[allocatedBuffer].free = false;
+    metainfo[allocatedBuffer].free = false;
   metainfo[allocatedBuffer].blockNum = blockNum;
+  metainfo[allocatedBuffer].dirty=false;
+  metainfo[allocatedBuffer].timeStamp=0;
 
   return allocatedBuffer;
 }
@@ -59,4 +87,19 @@ if(metainfo[i].blockNum==blockNum)
 }
   // if block is not in the buffer
   return E_BLOCKNOTINBUFFER;
+}
+
+
+int StaticBuffer::setDirtyBit(int blockNum){
+    // find the buffer index corresponding to the block using getBufferNum().
+        int index=getBufferNum(blockNum);
+
+        if(index==E_BLOCKNOTINBUFFER)
+          return E_BLOCKNOTINBUFFER;
+        if(index==E_OUTOFBOUND)
+          return E_OUTOFBOUND;
+        else 
+          {
+            metainfo[index].dirty=true;
+          }
 }

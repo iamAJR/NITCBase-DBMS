@@ -196,7 +196,7 @@ int OpenRelTable::openRel(char relName[ATTR_SIZE]) {
 
 
 
-  /****** Setting up Attribute Cache entry for the relation ******/
+  /****** Setting up Attribute Cache entry for the relation ****/
 
   // let listHead be used to hold the head of the linked list of attrCache entries.
   Attribute attrCatRecord[ATTRCAT_NO_ATTRS];
@@ -242,9 +242,9 @@ int OpenRelTable::openRel(char relName[ATTR_SIZE]) {
   //}
 
   // set the relIdth entry of the AttrCacheTable to listHead.
-	AttrCacheTable::attrCache[ca] = head;
+	//AttrCacheTable::attrCache[ca] = head;
 
-  /****** Setting up metadata in the Open Relation Table for the relation******/
+  /** Setting up metadata in the Open Relation Table for the relation*****/
   tableMetaInfo[ca].free = false;
 	strcpy(tableMetaInfo[ca].relName, relName);  
 
@@ -296,6 +296,10 @@ int OpenRelTable::closeRel(int relId) {
 
 
 
+
+
+
+
 /*
 #include "OpenRelTable.h"
 #include <cstdlib>
@@ -318,7 +322,7 @@ OpenRelTable::OpenRelTable() {
 
 
 
-  /**** setting up Relation Catalog relation in the Relation Cache Table****
+  /**** setting up Relation Catalog relation in the Relation Cache Table***
   RecBuffer relCatBlockRel(RELCAT_BLOCK);
 
   Attribute relCatRecordRel[RELCAT_NO_ATTRS];
@@ -335,7 +339,7 @@ OpenRelTable::OpenRelTable() {
 
 
 
-  /**** setting up Attribute Catalog relation in the Relation Cache Table ***
+  *** setting up Attribute Catalog relation in the Relation Cache Table **
 
 RecBuffer relCatBlockAttr(RELCAT_BLOCK);
 
@@ -356,7 +360,7 @@ RecBuffer relCatBlockAttr(RELCAT_BLOCK);
 
 
 
-/*********Students into relation cache********
+/*********Students into relation cache*******
 
     //this is for the students relation
 
@@ -372,13 +376,11 @@ RecBuffer relCatBlockAttr(RELCAT_BLOCK);
     RelCacheTable::relCache[ATTRCAT_RELID+1] = (struct RelCacheEntry*)malloc(sizeof(RelCacheEntry));;
     *(RelCacheTable::relCache[ATTRCAT_RELID+1]) = relCacheEntryRel;
 
-
-
- /************ Setting up Attribute cache entries **********/
+ /************ Setting up Attribute cache entries *********
   // (we need to populate attribute cache with entries for the relation catalog
   //  and attribute catalog.)
 
-  /**** setting up Relation Catalog relation in the Attribute Cache Table***
+  /**** setting up Relation Catalog relation in the Attribute Cache Table**
   RecBuffer attrCatBlockRel(ATTRCAT_BLOCK);
   Attribute attrCatRecordRel[ATTRCAT_NO_ATTRS];
  
@@ -414,7 +416,7 @@ struct AttrCacheEntry* attrCacheEntryRelTemp=attrCacheEntryRel;
 
 
 
-  /**** setting up Attribute Catalog relation in the Attribute Cache Table **
+  ** setting up Attribute Catalog relation in the Attribute Cache Table *
  RecBuffer attrCatBlockAttr(ATTRCAT_BLOCK);
 
     Attribute attrCatRecordAttr[ATTRCAT_NO_ATTRS];
@@ -445,11 +447,11 @@ attrCatBlockAttr.getRecord(attrCatRecordAttr,i);
 }
 
 
-/*************students into attribute cache*******/
-
-  //  struct AttrCacheEntry* attrCacheEntryRel=(struct AttrCacheEntry*)malloc(sizeof(AttrCacheEntry));
-   // struct AttrCacheEntry* attrCacheEntryRelTemp=attrCacheEntryRel;
-  /*  for(int i=12;i<16;i++){
+***********students into attribute cache******
+int i;
+   struct AttrCacheEntry* attrCacheEntryRel=(struct AttrCacheEntry*)malloc(sizeof(AttrCacheEntry));
+    struct AttrCacheEntry* attrCacheEntryRelTemp=attrCacheEntryRel;
+    for(i=12;i<16;i++){
 
         attrCatBlockRel.getRecord(attrCatRecordRel,i);
         AttrCacheTable::recordToAttrCatEntry(attrCatRecordRel,&(attrCacheEntryRelTemp->attrCatEntry));
@@ -465,15 +467,15 @@ attrCatBlockAttr.getRecord(attrCatRecordAttr,i);
     }
   AttrCacheTable::attrCache[ATTRCAT_RELID+1] = attrCacheEntryRel;
 
-*/
 
-/*int OpenRelTable::getRelId(char relName[ATTR_SIZE]) {
+
+int OpenRelTable::getRelId(char relName[ATTR_SIZE]) {
    if (strcmp(relName, RELCAT_RELNAME) == 0) return RELCAT_RELID;
-   if (strcmp(relName, ATTRCAT_REL NAME) == 0) return ATTRCAT_RELID;
+   if (strcmp(relName, ATTRCAT_RELNAME) == 0) return ATTRCAT_RELID;
    if(strcmp(relName,"Students")==0) return 2;
    return E_RELNOTOPEN;
-}*/
-/*void freeAttrCacheEntry(AttrCacheEntry* head){
+}
+void freeAttrCacheEntry(AttrCacheEntry* head){
     if(!head)return;
     freeAttrCacheEntry(head->next);
     delete head;
@@ -489,6 +491,7 @@ OpenRelTable::~OpenRelTable() {
     // using the freeAttrCacheEntry function
     for(int attrCacheIdx=0;attrCacheIdx<MAX_OPEN;attrCacheIdx++) freeAttrCacheEntry(AttrCacheTable::attrCache[attrCacheIdx]);
 
-}*/ 
+}
 
 
+*/
