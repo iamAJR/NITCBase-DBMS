@@ -1,5 +1,5 @@
 #include "BlockBuffer.h"
-
+#include <iostream>
 #include <cstdlib>
 #include <cstring>
 
@@ -62,28 +62,47 @@ return SUCCESS;
 
 int RecBuffer::setRecord(union Attribute *rec, int slotNum)
 {
-  struct HeadInfo head;
+   unsigned char *bufferPtr;
+    /* get the starting address of the buffer containing the block
+       using loadBlockAndGetBufferPtr(&bufferPtr). */
+    int bufferNum=BlockBuffer::loadBlockAndGetBufferPtr(&bufferPtr);
+    if(bufferNum!=SUCCESS){
+      return bufferNum;
+    }
+    // if loadBlockAndGetBufferPtr(&bufferPtr) != SUCCESS
+        // return the value returned by the call.
 
-  // get the header using this.getHeader() function
-  this->getHeader(&head);
-
-  int attrCount = head.numAttrs;
-  int slotCount = head.numSlots;
+    /* get the header of the block using the getHeader() function */
+    HeadInfo head;
+    BlockBuffer::getHeader(&head);
+  
+    // get number of attributes in the block.
+    int attrCount=head.numAttrs;
+    int slotCount=head.numSlots;
+    // get the number of slots in the block.
+    if(slotNum>slotCount or slotNum<0){
+      return E_OUTOFBOUND;}
 
   // read the block at this.blockNum into a buffer
-  unsigned char buffer[BLOCK_SIZE];
-  Disk::readBlock(buffer, this->blockNum);
+ // unsigned char buffer[BLOCK_SIZE];
+ // Disk::readBlock(buffer, this->blockNum);
 
   /* record at slotNum will be at offset HEADER_SIZE + slotMapSize + (recordSize * slotNum)
      - each record will have size attrCount * ATTR_SIZE
      - slotMap will be of size slotCount
   */
   int recordSize = attrCount * ATTR_SIZE;
-  unsigned char *slotPointer = buffer + 32 + slotCount + recordSize * slotNum;
+  unsigned char *slotPointer = bufferPtr + HEADER_SIZE + slotCount + (recordSize * slotNum);
 
   // load the record into the rec data structure
   memcpy(slotPointer, rec, recordSize);
-  Disk::writeBlock(buffer,this->blockNum);
+  // update dirty bit using setDirtyBit()
+    int ret=StaticBuffer::setDirtyBit(this->blockNum);
+    if(ret!=SUCCESS){
+      std::cout<<"wrong setDirty function";
+    }
+
+  //Disk::writeBlock(buffer,this->blockNum);
 
   return SUCCESS;
 }
@@ -93,7 +112,14 @@ int BlockBuffer::loadBlockAndGetBufferPtr(unsigned char **buffPtr) {
   // check whether the block is already present in the buffer using StaticBuffer.getBufferNum()
   int bufferNum = StaticBuffer::getBufferNum(this->blockNum);
 
-  if (bufferNum == E_BLOCKNOTINBUFFER) {
+  if (bufferNum != E_BLOCKNOTINBUFFER) {
+     for (int bufferIndex = 0; bufferIndex < BUFFER_CAPACITY; bufferIndex++) {
+      StaticBuffer::metainfo[bufferIndex].timeStamp++;
+    }
+    StaticBuffer::metainfo[bufferNum].timeStamp = 0;
+  }
+  else{
+
     bufferNum = StaticBuffer::getFreeBuffer(this->blockNum);
 
     if (bufferNum == E_OUTOFBOUND) {

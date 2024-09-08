@@ -33,15 +33,15 @@ StaticBuffer::~StaticBuffer() {
 }
 
 int StaticBuffer::getFreeBuffer(int blockNum) {
-  if (blockNum < 0 || blockNum > DISK_BLOCKS) {
+  if (blockNum < 0 || blockNum >=DISK_BLOCKS) {
     return E_OUTOFBOUND;
   }
   int allocatedBuffer=-1;
 
   int maxTimeStamp=-1; 
  for(int i=0;i<BUFFER_CAPACITY;i++){
-  if (!metaInfo[i].free) {
-            metaInfo[i].timeStamp++;
+  if (!metainfo[i].free) {
+            metainfo[i].timeStamp++;
         }
 
 	if(metainfo[i].free){
@@ -51,13 +51,13 @@ int StaticBuffer::getFreeBuffer(int blockNum) {
 
 if (allocatedBuffer == -1) {
         for (int i = 0; i < BUFFER_CAPACITY; i++) {
-            if (metaInfo[i].timeStamp > maxTimeStamp) {
-                maxTimeStamp = metaInfo[i].timeStamp;
+            if (metainfo[i].timeStamp > maxTimeStamp) {
+                maxTimeStamp = metainfo[i].timeStamp;
                 allocatedBuffer = i;
             }
         }
-        if (metaInfo[allocatedBuffer].dirty) {
-            Disk::writeBlock(metaInfo[allocatedBuffer].blockNum, buffer[allocatedBuffer]);
+        if (metainfo[allocatedBuffer].dirty) {
+            Disk::writeBlock(blocks[allocatedBuffer],metainfo[allocatedBuffer].blockNum);
         }
     }
 
@@ -76,7 +76,7 @@ if (allocatedBuffer == -1) {
 int StaticBuffer::getBufferNum(int blockNum) {
   // Check if blockNum is valid (between zero and DISK_BLOCKS)
   // and return E_OUTOFBOUND if not valid.
- if (blockNum < 0 || blockNum > DISK_BLOCKS) {
+ if (blockNum < 0 || blockNum >=DISK_BLOCKS) {
     return E_OUTOFBOUND;
   }
 
@@ -102,4 +102,6 @@ int StaticBuffer::setDirtyBit(int blockNum){
           {
             metainfo[index].dirty=true;
           }
+
+        return SUCCESS; 
 }

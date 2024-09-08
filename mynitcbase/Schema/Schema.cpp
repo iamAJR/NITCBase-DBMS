@@ -36,18 +36,18 @@ int Schema::closeRel(char relName[ATTR_SIZE]) {
 
 
 int Schema::renameRel(char oldRelName[ATTR_SIZE], char newRelName[ATTR_SIZE]) {
-   if ((strcmp(relName,ATTRCAT_RELNAME)==0) || (strcmp(relName,RELCAT_RELNAME)==0) ){
+   if ((strcmp(oldRelName,ATTRCAT_RELNAME)==0) || (strcmp(oldRelName,RELCAT_RELNAME)==0) ){
     return E_NOTPERMITTED;
   }
-  
+  if ((strcmp(newRelName,ATTRCAT_RELNAME)==0) || (strcmp(newRelName,RELCAT_RELNAME)==0) ){
+    return E_NOTPERMITTED;
+  }
 
     int relId=OpenRelTable::getRelId(oldRelName);
-    if(relId<0 or relId>=12)
-      return E_RELNOTOPEN;
-    else  
+    if(relId!=E_RELNOTOPEN)
       return E_RELOPEN;
     int retVal = BlockAccess::renameRelation(oldRelName, newRelName);
-    return retVal
+    return retVal;
 }
 
 
@@ -55,10 +55,8 @@ int Schema::renameAttr(char *relName, char *oldAttrName, char *newAttrName) {
    if ((strcmp(relName,ATTRCAT_RELNAME)==0) || (strcmp(relName,RELCAT_RELNAME)==0) ){
     return E_NOTPERMITTED;
   }
-    int relId=OpenRelTable::getRelId(oldRelName);
-    if(relId<0 or relId>=12)
-      return E_RELNOTOPEN;
-    else  
+    int relId=OpenRelTable::getRelId(oldAttrName);
+    if(relId!=E_RELNOTOPEN)
       return E_RELOPEN;
     
 int c=BlockAccess::renameAttribute(relName,  oldAttrName,  newAttrName);
