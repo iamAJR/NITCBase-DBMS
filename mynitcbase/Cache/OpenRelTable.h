@@ -28,8 +28,6 @@ class OpenRelTable {
 
   // method
   static int getFreeOpenRelTableEntry();
-  void setupRelCache(int block, int slot, int relId);  // Declaration of setupRelCache
-  void setupAttrCache(int block, int startSlot, int endSlot, int relId);  // Declaration of setupAttrCache
 };
 
 #endif  // NITCBASE_OPENRELTABLE_H
